@@ -1,0 +1,32 @@
+//@version=5
+indicator("EMA Trend Strategy", overlay=true)
+
+// 定义 EMA 参数
+ema1_length = 1
+ema7_length = 7
+
+// 计算 EMA 值
+ema1 = ta.ema(close, ema1_length)
+ema7 = ta.ema(close, ema7_length)
+
+// 定义策略信号
+var string signal = na
+
+// 检查条件并生成信号
+if (ta.crossover(ema1, ema7))
+    if (ta.valuewhen(ta.crossover(ema1, ema7), ta.ema(close[1], ema1_length), 1) > ta.valuewhen(ta.crossover(ema1, ema7), ta.ema(close[1], ema7_length), 1))
+        signal := "LONG"
+    else
+        signal := "SHORT"
+else
+    signal := na
+
+// 绘制信号标签
+if (signal == "LONG")
+    label.new(bar_index, high, yloc= yloc.abovebar, text="LONG", style=label.style_label_up, color=color.green, textcolor=color.white, size=size.small)
+if (signal == "SHORT")
+    label.new(bar_index, low,  yloc= yloc.abovebar,text="SHORT", style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
+
+// 输出 EMA 值以便于调试和验证
+plot(ema1, color=color.blue, title="EMA 1")
+plot(ema7, color=color.orange, title="EMA 7")
